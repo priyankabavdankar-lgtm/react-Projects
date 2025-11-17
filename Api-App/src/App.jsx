@@ -5,33 +5,16 @@ import Card from './Component/Card';
 function App() {
 
   const [products, setProducts] = useState([])
-  const [category, setCategory] = useState(["all"])
+  const [category, setCategory] = useState("all")
   const [price, setPrice] = useState("all-price")
+  const [filterProducts, setFilterProducts] = useState([])
 
   async function FetchData () {
     try {
       let res = await fetch("https://fakestoreapi.com/products");
       let data = await res.json()
-
-      if(category==="all" ){
-      setProducts(data)
-      }
-      else{
-        setProducts(data.filter(e=>e.category===category))
-      }
-
-      if(price==="all-price"){
-        setProducts(data)
-      }
-      if(price==="lowPrice"){
-        setProducts(data.filter(e=>e.price<100))
-      }
-      if(price==="medPrice"){
-        setProducts(data.filter(e=>e.price>=100 && e.price<500))
-      }
-      if(price==="highPrice"){
-        setProducts(data.filter(e=>e.price>=500 && e.price<=1000))
-      }
+      setProducts(data);
+      setFilterProducts(data);
       
     } catch (error) {
       console.log(error)
@@ -40,7 +23,27 @@ function App() {
   useEffect (() =>{
       FetchData()
 
-  },[category, price])
+  },[])
+
+  useEffect (() =>{
+    let filtered = [...products]
+
+    if(category!=="all" ){
+        filtered = filtered.filter(e=>e.category===category)
+      }
+
+      if(price==="lowPrice"){
+        filtered= filtered.filter(e=>e.price<100)
+      }
+      if(price==="medPrice"){
+        filtered= filtered.filter(e=>e.price>=100 && e.price<500)
+      }
+      if(price==="highPrice"){
+        filtered=filtered.filter(e=>e.price>=500 && e.price<=1000)
+      }
+      setFilterProducts(filtered)
+  }, [category, price, products])
+
 
   return (
     <>
@@ -70,7 +73,7 @@ function App() {
 
 
       <div className="row">
-        {products.map(e => <Card data={e}></Card>)}
+        {filterProducts.map(e => <Card data={e}></Card>)}
       </div>
 
    
